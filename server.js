@@ -19,7 +19,7 @@ const server = app.listen(port, () => {
     console.log(`This app is listening on port ${port}`);
 })
 
-// socket io
+// starting socket io
 const io = require("socket.io")(server, {
     cors: {
         origin: Frontend_HOST
