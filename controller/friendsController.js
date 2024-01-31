@@ -6,9 +6,9 @@ const User = require("../module/userModule")
 const fetchFriend = async (req, res) => {
     let userId = req.params.userId
     try {
-        const data = await User.find({ _id: userId })
+        const data = await User.findById({ _id: userId }, { password: 0, userToken: 0, isVerified: 0 })
 
-        res.json({ data: data[0].name, message: "User fetched" })
+        res.json({ data: data, message: "User fetched" })
     } catch (error) {
         console.log(error.message);
         res.status(500).send("Server error");
@@ -19,7 +19,7 @@ const fetchFriend = async (req, res) => {
 const findFriend = async (req, res) => {
     let email = req.params.email
     try {
-        const data = await User.findOne({ email }, "name")
+        const data = await User.findOne({ email }, { password: 0, userToken: 0, isVerified: 0 })
         console.log(data, email);
         res.json({ data: data ? data : "", message: "User is found" })
     } catch (error) {

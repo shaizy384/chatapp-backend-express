@@ -19,7 +19,7 @@ const registerUser = async (req, res) => {
         return res.status(400).json({ errors: errors.array(), message: "Invalid input fields" })
     }
 
-    const { name, email, password, isVerfied } = req.body
+    const { name, email, password, isVerified } = req.body
     try {
         // Check whether the user with this email exists already
         let user = await User.findOne({ email })
@@ -29,8 +29,15 @@ const registerUser = async (req, res) => {
         const hashPassword = await bcrypt.hash(password, salt)
 
         user = await User.create({
-            name, email, password: hashPassword, isVerfied, userToken: ""
+            name, email, password: hashPassword, isVerified, userToken: ""
         })
+        const data = {
+            user: {
+                id: user._id
+            }
+        }
+        const authToken = jwt.sign(data, jwtSec)
+
         const emailToken = jwt.sign({ id: user._id }, secretToken, { expiresIn: "1m" })
 
         const userToken = { "userToken": emailToken }
@@ -50,7 +57,7 @@ const registerUser = async (req, res) => {
 
         await sendEmail(user.email, subject, message)
 
-        res.json({ data: user.name, message: "A verification link is sent to your account, please verify to activate your account" })
+        res.json({ data: authToken, message: "A verification link is sent to your account, please verify to activate your account" })
     } catch (error) {
         console.log(error.message);
         res.status(500).json({ message: "Server error" });
@@ -67,11 +74,11 @@ const verifyEmail = async (req, res) => {
         let verifyToken = await User.findOne({ userToken: token })
         if (!verifyToken) { return res.status(400).json({ message: "Invalid Link" }) }
 
-        const verified = { "isVerfied": "true" }
+        const verified = { "isVerified": "true" }
         await User.findByIdAndUpdate(id, verified, { new: true })
 
-        res.redirect(`${frontHost}/login`)
-        res.json({ message: "Account verified successfully" })
+        res.redirect(`${frontHost}/`)
+        // res.json({ message: "Account verified successfully" })
     } catch (error) {
         console.log(error.message);
         res.status(500).json({ message: "Server error" });
@@ -87,10 +94,11 @@ const loginUser = async (req, res) => {
     try {
         let user = await User.findOne({ email })
         if (!user) { return res.status(400).json({ message: "Invalid credentials" }) }
+        console.log(user.isVerified);
 
         let checkPass = await bcrypt.compare(password, user.password)
         if (!checkPass) { return res.status(400).json({ message: "Invalid credentials" }) }
-        // if (!user.isVerfied) { res.redirect(`${frontHost}/verifyemail`); }
+        // if (!user.isVerified) { res.redirect(`${frontHost}/verifyemail`); }
 
         const data = {
             user: {
@@ -98,6 +106,18 @@ const loginUser = async (req, res) => {
             }
         }
         let authToken = jwt.sign(data, jwtSec)
+
+        if (!user.isVerified) {
+            // Send Email
+            const link = `${backHost}/api/user/verify/${user._id}/${user.userToken}`
+            const subject = `Verify Your GalBaat Email Address`
+            const message = `<p>Thanks for signing up with GalBaat! Click on the link below to verify your email:</p>
+            <a href="${link}">Click here</a>
+            <p>This link will expire in 24 hours. If you did not sign up for a Render account,
+            you can safely ignore this email. Have fun, and don't hesitate to contact us with your feedback.</p>
+            <p>Best,<br>The ChatApp Team</p>`
+            await sendEmail(user.email, subject, message)
+        }
 
         res.json({ auth: authToken, message: "Logged in successfully" });
     } catch (error) {

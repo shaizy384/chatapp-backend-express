@@ -5,6 +5,7 @@ const Conversation = require("../module/Conversation")
 const createConversation = async (req, res) => {
     const { senderId } = req.body
     let recieverId = req.user.id
+    console.log({ recieverId, senderId, bodysenderId: req.body });
 
     try {
         let conversion = await Conversation.find({
