@@ -2,6 +2,17 @@ const mongoose = require("mongoose")
 
 const userSchema = mongoose.Schema(
     {
+        //accountId can be google Id, facebook Id
+        accountId: {
+            type: String,
+        },
+        photoURL: {
+            type: String,
+        },
+        provider: {
+            type: String,
+            default: "custom"
+        },
         name: {
             type: String,
             required: true
@@ -13,7 +24,7 @@ const userSchema = mongoose.Schema(
         },
         password: {
             type: String,
-            required: true
+            // required: true
         },
         userToken: {
             type: String,

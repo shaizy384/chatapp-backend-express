@@ -1,6 +1,6 @@
 const express = require("express")
 const router = express.Router()
-const { registerUser, loginUser, fetchUser, verifyEmail, forgotPassword, resetLink, resetPassword } = require("../controller/authController")
+const { registerUser, loginUser, fetchUser, verifyEmail } = require("../controller/authController")
 const { body } = require("express-validator")
 const validateToken = require("../middleware/validateToken")
 // const validateResetToken = require("../middleware/validateResetToken")

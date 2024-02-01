@@ -2,18 +2,30 @@ const express = require("express")
 const connectDb = require("./config/dbConnection")
 const app = express()
 const cors = require("cors")
+const cookieSession = require("cookie-session")
+const passport = require("passport")
+const passportSetup = require("./passport")
 require('dotenv').config()
 
 const port = process.env.PORT || 2800
 const Frontend_HOST = process.env.Frontend_HOST
 connectDb()
+app.use(cookieSession({ name: "session", keys: ["galBaat"], maxAge: 24 * 60 * 60 * 100 }))
+app.use(cors({
+    origin: "http://localhost:3000",
+    methods: "GET,POST,PUT,DELETE",
+    credentials: true,
+}))
 app.use(express.json())
-app.use(cors())
+app.use(passport.initialize())
+app.use(passport.session())
 
+app.use('/auth', require("./routes/socialAuth"))
 app.use('/api/user', require("./routes/auth"))
 app.use('/api/chats', require("./routes/chats"))
 app.use('/api/message', require("./routes/message"))
 app.use('/api/friends', require("./routes/friends"))
+// app.use('/api/google', require("./passport"))
 
 const server = app.listen(port, () => {
     console.log(`This app is listening on port ${port}`);
