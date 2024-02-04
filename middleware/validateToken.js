@@ -4,7 +4,6 @@ const validateToken = (req, res, next) => {
 
     const jwtSec = process.env.JWT_SECRET
     const authToken = req.header("x-auth-token")
-    console.log("auth gmail user: ", req.user);
     if (!authToken) { return res.status(400).send("Please authenticate using a valid token") }
 
     try {

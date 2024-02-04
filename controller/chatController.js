@@ -8,18 +8,26 @@ const createConversation = async (req, res) => {
     console.log({ recieverId, senderId, bodysenderId: req.body });
 
     try {
-        let conversion = await Conversation.find({
-            members: { $all: [recieverId, senderId] }
-        })
-        if (conversion.length !== 0) {
-            return res.status(400).json({ message: "Conversion already exists" })
+        let conversation;
+        if (recieverId === senderId) {
+            conversation = await Conversation.find({
+                members: [recieverId, senderId]
+            })
+        } else {
+            conversation = await Conversation.find({
+                members: { $all: [recieverId, senderId] }
+            })
+        }
+        console.log("already existed conv: ", conversation);
+        if (conversation.length !== 0) {
+            return res.status(400).json({ message: "Conversation already exists" })
         }
 
         data = await Conversation.create({
             members: [recieverId, senderId]
         })
 
-        res.json({ data, message: "Conversion created" })
+        res.json({ data, message: "Conversation created" })
     } catch (error) {
         console.log(error.message);
         res.status(500).send("Server error");
@@ -35,7 +43,7 @@ const fetchConversation = async (req, res) => {
             members: { $in: [recieverId] }
         })
 
-        res.json({ data, message: "Conversion created" })
+        res.json({ data, message: "Conversion fetched" })
     } catch (error) {
         console.log(error.message);
         res.status(500).send("Server error");

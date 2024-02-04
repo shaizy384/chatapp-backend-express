@@ -25,7 +25,7 @@ passport.use(new GoogleStrategy({
         // });
         // for mongodb
         const { sub, name, picture, email, email_verified } = profile._json
-        console.log("amb", sub, name, picture, email, email_verified );
+        console.log("amb", sub, name, picture, email, email_verified);
         let user = await User.findOne({
             accountId: sub,
             provider: "google",
@@ -35,7 +35,7 @@ passport.use(new GoogleStrategy({
                 accountId: sub,
                 email: email,
                 name: name,
-                picture: picture,
+                photoURL: picture,
                 provider: "google",
                 isVerified: email_verified,
             })
@@ -52,10 +52,21 @@ passport.use(new FacebookStrategy({
     clientSecret: FACEBOOK_APP_SECRET,
     callbackURL: "/auth/facebook/callback"
 },
-    function (accessToken, refreshToken, profile, cb) {
-        User.findOrCreate({ facebookId: profile.id }, function (err, user) {
-            return cb(err, user);
-        });
+    async function (accessToken, refreshToken, profile, cb) {
+        console.log("facebook profile: ", profile);
+        let user = await User.findOne({ facebookId: profile.id, provider: "facebook" });
+        if (!user) {
+            user = new User({
+                accountId: profile.id,
+                // email: email,
+                name: profile.displayName,
+                // picture: picture,
+                provider: profile.provider,
+                // isVerified: email_verified,
+            })
+            await user.save()
+        }
+        cb(null, profile);
     }
 ));
 
