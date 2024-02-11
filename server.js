@@ -39,6 +39,7 @@ const io = require("socket.io")(server, {
 })
 
 let users = [];     // stores online users
+let typers = [];     // stores typing users
 io.on("connection", (socket) => {
     console.log("connected to socket.io");
     io.emit("welcome", "hello this is socket io");
@@ -50,6 +51,23 @@ io.on("connection", (socket) => {
         userId && (!users.some(user => user.userId === userId) && users.push({ userId, socketId: socket.id }))
         // console.log("userId: ", userId, users);
         io.emit("getUsers", users);
+    });
+
+    // add typing users
+    socket.on("typing", (userId, conversationId) => {
+        //check user id, if not exist add in the array
+        console.log("a user is typing");
+        userId && (!typers.some(typer => typer.userId === userId && typer.conversationId === conversationId) && typers.push({ userId, conversationId, typing: true }))
+        console.log("typers: ", userId, conversationId, typers);
+        io.emit("getTypers", typers);
+    });
+
+    // remove typing user
+    socket.on("stop typing", (userId, conversationId) => {
+        //check user id, if exists remove from the array
+        console.log("user stopped typing");
+        typers = typers.filter(typer => typer?.userId !== userId && typer?.conversationId !== conversationId)
+        io.emit("getTypers", typers);
     });
 
     // send and get message
