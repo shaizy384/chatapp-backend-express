@@ -131,8 +131,29 @@ const fetchUser = async (req, res) => {
     try {
         userId = req.user.id
         let user = await User.findById(userId).select("-password")
+        if (!user)
+            return res.status(404).json({ message: "User not found" });
 
-        res.send(user);
+        if (user)
+            return res.send(user);
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send("Server error");
+    }
+}
+
+// Route 4: fetch user using Get "/api/user/fetchuser/"
+const updateUser = async (req, res) => {
+    try {
+        userId = req.user.id
+        let user = await User.findById(userId)
+        if (!user)
+            return res.status(404).json({ message: "User not found" });
+
+        console.log(req.body);
+        user = await User.findByIdAndUpdate(userId, { $set: { ...req.body } }, { new: true })
+
+        res.json({ message: "Successfully updated!", user });
     } catch (error) {
         console.log(error.message);
         res.status(500).send("Server error");
@@ -236,5 +257,4 @@ const resetPassword = async (req, res) => {
     }
 }
 
-
-module.exports = { registerUser, loginUser, fetchUser, verifyEmail, forgotPassword, resetLink, resetPassword }
+module.exports = { registerUser, loginUser, fetchUser, updateUser, verifyEmail, forgotPassword, resetLink, resetPassword }

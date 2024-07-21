@@ -47,7 +47,7 @@ io.on("connection", (socket) => {
     // add user
     socket.on("addUser", userId => {
         //check user id, if not exist add in the array
-        console.log("a user connected");
+        console.log("a user connected", userId);
         userId && (!users.some(user => user.userId === userId) && users.push({ userId, socketId: socket.id }))
         // console.log("userId: ", userId, users);
         io.emit("getUsers", users);

@@ -39,9 +39,65 @@ const fetchConversation = async (req, res) => {
     let recieverId = req.user.id
 
     try {
-        const data = await Conversation.find({
-            members: { $in: [recieverId] }
-        })
+        // const data = await Conversation.find({
+        //     members: { $in: [recieverId] }
+        // })
+
+
+        const data = await Conversation.aggregate([
+            {
+                $match: {
+                    members: { $in: [recieverId] }
+                }
+            },
+            {
+                $addFields: {
+                    friend_id: {
+                        $arrayElemAt: [
+                            {
+                                $filter: {
+                                    input: "$members",
+                                    as: "member",
+                                    cond: { $ne: ["$$member", recieverId] }
+                                }
+                            },
+                            0
+                        ]
+                    }
+                }
+            },
+            {
+                $addFields: {
+                    friend_id: { $toObjectId: "$friend_id" }
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "friend_id",
+                    foreignField: "_id",
+                    as: "friendData",
+                    pipeline: [
+                        {
+                            $project: {
+                                email: 1,
+                                name: 1,
+                                photoURL: 1
+                            }
+                        }
+                    ]
+                },
+            },
+            {
+                $addFields: {
+                    friendData: {
+                        $first: "$friendData"
+                    }
+                }
+            }
+        ])
+
+        // console.log("newData: ", recieverId, newData);
 
         res.json({ data, message: "Conversion fetched" })
     } catch (error) {

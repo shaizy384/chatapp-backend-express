@@ -1,6 +1,6 @@
 const express = require("express")
 const router = express.Router()
-const { registerUser, loginUser, fetchUser, verifyEmail } = require("../controller/authController")
+const { registerUser, loginUser, fetchUser, verifyEmail, updateUser } = require("../controller/authController")
 const { body } = require("express-validator")
 const validateToken = require("../middleware/validateToken")
 // const validateResetToken = require("../middleware/validateResetToken")
@@ -17,6 +17,7 @@ router.post('/login', [
 ], loginUser)
 
 router.get('/fetchuser', validateToken, fetchUser)
+router.post('/updateuser', validateToken, updateUser)
 
 router.get('/verify/:id/:token', verifyEmail)
 
