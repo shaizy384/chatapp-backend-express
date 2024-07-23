@@ -18,32 +18,43 @@ passport.use(new GoogleStrategy({
     profileFields: ['id', 'displayName', 'name', 'picture.type(large)', 'email'],
 },
     async function (accessToken, refreshToken, profile, cb) {
-        console.log("gmail profile: ", profile._json);
-        // return cb(null, profile);
-        // User.findOrCreate({ googleId: profile.id }, function (err, user) {
-        //     return cb(err, user);
-        // });
-        // for mongodb
-        const { sub, name, picture, email, email_verified } = profile._json
-        console.log("amb", sub, name, picture, email, email_verified);
-        let user = await User.findOne({
-            accountId: sub,
-            provider: "google",
-        })
-        if (!user) {
-            user = new User({
-                accountId: sub,
-                email: email,
-                name: name,
-                photoURL: picture,
-                provider: "google",
-                isVerified: email_verified,
+        try {
+            console.log("gmail profile: ", profile._json);
+            // return cb(null, profile);
+            // User.findOrCreate({ googleId: profile.id }, function (err, user) {
+            //     return cb(err, user);
+            // });
+            // for mongodb
+            const { sub, name, picture, email, email_verified } = profile._json
+            console.log("amb", sub, name, picture, email, email_verified);
+            let user = await User.findOne({
+                email,
+                // provider: "google",
+                // accountId: sub,
+                // provider: "google",
             })
-            await user.save()
+            console.log("user exists ", user, sub);
+            if (user && user.provider !== 'google') {
+                return cb(new Error('An account already exists with a different provider.'));
+            }
+            if (!user) {
+                console.log("user not not exists ", user);
+                user = new User({
+                    accountId: sub,
+                    email: email,
+                    name: name,
+                    photoURL: picture,
+                    provider: "google",
+                    isVerified: email_verified,
+                })
+                await user.save()
+            }
+            cb(null, profile);
+            // console.log("email user ", user);
+            // User.save(user)
+        } catch (error) {
+            return cb(error);
         }
-        cb(null, profile);
-        // console.log("email user ", user);
-        // User.save(user)
     }
 ));
 

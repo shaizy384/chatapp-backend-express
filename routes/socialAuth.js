@@ -15,15 +15,16 @@ router.get('/login/failed', (req, res) => {
 })
 router.get("/login/success", async (req, res) => {
     if (req.user) {
-        const id = await User.findOne({ accountId: req.user }).select("_id")
-        console.log("login id: ", req.user, id._id);
-        const data = {
-            user: {
-                id: id._id
-            }
-        }
-        let authToken = jwt.sign(data, jwtSec)
-        return res.json({ auth: authToken, message: "Logged in successfully" });
+        const user = await User.findOne({ accountId: req.user }).select("_id")
+        console.log("login id: ", req.user, user?._id);
+        // const data = {
+        //     user: {
+        //         id: id._id
+        //     }
+        // }
+        // let authToken = jwt.sign(data, jwtSec)
+        return res.json({ user, message: "Logged in successfully" });
+        // return res.json({ auth: authToken, message: "Logged in successfully" });
         // return res.status(200).json({
         //     message: "successfull",
         //     user: req.user,
@@ -44,6 +45,25 @@ router.get('/google/callback', passport.authenticate('google', {
     successRedirect: Frontend_HOST,
     failureRedirect: '/login/failed',
 }))
+
+// Express route to handle the error response
+// router.get('/google/callback', (req, res, next) => {
+//     passport.authenticate('google', (err, user) => {
+//         if (err) {
+//             // Handle error response
+//             return res.status(400).json({ message: err.message });
+//         }
+//         if (!user) {
+//             return res.redirect('/login');
+//         }
+//         req.logIn(user, (err) => {
+//             if (err) {
+//                 return res.status(400).json({ message: err.message });
+//             }
+//             return res.redirect('/'); // Redirect to your desired page
+//         });
+//     })(req, res, next);
+// });
 
 router.get('/facebook', passport.authenticate('facebook', { scope: 'email' }))
 router.get('/facebook/callback', passport.authenticate('facebook', {
