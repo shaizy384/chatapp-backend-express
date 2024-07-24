@@ -10,7 +10,7 @@ const backHost = process.env.Backend_HOST
 const frontHost = process.env.Frontend_HOST
 const jwtSec = process.env.JWT_SECRET
 const secretToken = process.env.SECRET_TOKEN
-// const resetKey = process.env.RESET_TOKEN
+const resetKey = process.env.RESET_TOKEN
 
 // Route 1: register user using POST "/api/user/register"
 const registerUser = async (req, res) => {
@@ -50,10 +50,10 @@ const registerUser = async (req, res) => {
     
         <a href="${link}">Click here</a>
         
-        <p>This link will expire in 24 hours. If you did not sign up for a Render account,
+        <p>This link will expire in 24 hours. If you did not sign up for a GalBaat account,
         you can safely ignore this email. Have fun, and don't hesitate to contact us with your feedback.</p>
         
-        <p>Best,<br>The ChatApp Team</p>`
+        <p>Best regards,<br>The ChatApp Team</p>`
 
         await sendEmail(user.email, subject, message)
 
@@ -113,9 +113,9 @@ const loginUser = async (req, res) => {
             const subject = `Verify Your GalBaat Email Address`
             const message = `<p>Thanks for signing up with GalBaat! Click on the link below to verify your email:</p>
             <a href="${link}">Click here</a>
-            <p>This link will expire in 24 hours. If you did not sign up for a Render account,
+            <p>This link will expire in 24 hours. If you did not sign up for a GalBaat account,
             you can safely ignore this email. Have fun, and don't hesitate to contact us with your feedback.</p>
-            <p>Best,<br>The ChatApp Team</p>`
+            <p>Best regards,<br>The ChatApp Team</p>`
             await sendEmail(user.email, subject, message)
         }
 
@@ -168,7 +168,7 @@ const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body
         let user = await User.findOne({ email })
-        if (!user) { return res.status(400).json({ message: "Invalid credentials" }) }
+        if (!user) { return res.status(400).json({ message: "Email not found!" }) }
 
         const data = {
             user: {
@@ -182,11 +182,10 @@ const forgotPassword = async (req, res) => {
         // send email
         const link = `${backHost}/api/user/reset-link/${user._id}/${resetString}`
         const subject = 'Password Reset Link'
-        const message = `<p>Thanks for signing up with ShaizMart! Click on the link below to verify your email:</p>
+        const message = `<p>We received a request to reset your password. Click on the link below to proceed with resetting your password:</p>
         <a href="${link}">Click here</a>
-        <p>This link will expire in 24 hours. If you did not sign up for a Render account,
-        you can safely ignore this email. Have fun, and don't hesitate to contact us with your feedback.</p>
-        <p>Best,<br>The ShaizMart Team</p>`
+        <p>This link will expire in 24 hours. If you did not request a password reset, you can safely ignore this email. If you have any questions or need further assistance, feel free to contact us.</p>
+        <p>Best regards,<br>The Galbaat Team</p>`
 
         await sendEmail(user.email, subject, message)
 
@@ -249,7 +248,7 @@ const resetPassword = async (req, res) => {
         const newPass = { password: hashPassword }
         await User.findByIdAndUpdate(userId, newPass, { new: true })
 
-        res.json({ message: "Password updated successfully" })
+        res.json({ message: "Password updated successfully! Please login" })
 
     } catch (error) {
         console.log(error.message);
