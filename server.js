@@ -71,12 +71,12 @@ io.on("connection", (socket) => {
     });
 
     // send and get message
-    socket.on("sendMessage", ({ senderId, receiverId, text }) => {
+    socket.on("sendMessage", ({ senderId, receiverId, text, conversationId, unseen_msgs }) => {
         // get specific user from array
         const user = users.find(user => user.userId === receiverId)
-        console.log("user?.socketId: ", user);
+        console.log("user?.socketId: ", user, conversationId);
         io.to(user?.socketId).emit("getMessage", {
-            senderId, text,
+            senderId, text, conversationId, unseen_msgs
         })
         // console.log("userId: ", users);
         // io.emit("getUsers", users)

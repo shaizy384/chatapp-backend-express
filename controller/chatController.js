@@ -1,5 +1,6 @@
 // const { validationResult } = require("express-validator")
-const Conversation = require("../module/Conversation")
+const Conversation = require("../module/Conversation");
+const User = require("../module/userModule");
 
 // Route 1: Create Conversation using POST "/api/chats"
 const createConversation = async (req, res) => {
@@ -34,7 +35,33 @@ const createConversation = async (req, res) => {
     }
 }
 
-// Route 2: find all conversations user using get "/api/chats/"
+// Route 2: Update Conversation using POST "/api/chats"
+const updateConversation = async (req, res) => {
+    let userId = req.user.id
+    console.log("body: ", req.body);
+
+    try {
+        let conversation = await Conversation.findById(req.body._id)
+
+        if (!conversation) {
+            return res.status(404).json({ message: "Conversation not found" })
+        }
+
+        conversation = await Conversation.findByIdAndUpdate(req.body._id, req.body, { new: true })
+
+        const friend_id = conversation.members.filter(c => c !== userId)[0]
+        const friendData = await User.findById(friend_id);
+
+        const data = { ...conversation?._doc, friend_id, friendData }
+
+        res.json({ data, message: "Conversation updated" })
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).send("Server error");
+    }
+}
+
+// Route 3: find all conversations user using get "/api/chats/"
 const fetchConversation = async (req, res) => {
     let recieverId = req.user.id
 
@@ -106,7 +133,7 @@ const fetchConversation = async (req, res) => {
     }
 }
 
-// Route 3: find conversation if exists using GET "/api/chats/find"
+// Route 4: find conversation if exists using GET "/api/chats/find"
 const findConversation = async (req, res) => {
     const { id } = req.body
     let recieverId = req.user.id
@@ -123,4 +150,4 @@ const findConversation = async (req, res) => {
     }
 }
 
-module.exports = { createConversation, fetchConversation, findConversation }
+module.exports = { createConversation, fetchConversation, findConversation, updateConversation }
