@@ -12,7 +12,7 @@ const Frontend_HOST = process.env.Frontend_HOST
 connectDb()
 app.use(cookieSession({ name: "session", keys: ["galBaat"], maxAge: 24 * 60 * 60 * 100 }))
 app.use(cors({
-    origin: "http://localhost:3000",
+    origin: Frontend_HOST,
     methods: "GET,POST,PUT,DELETE",
     credentials: true,
 }))
