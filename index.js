@@ -12,9 +12,8 @@ const Frontend_HOST = process.env.Frontend_HOST
 connectDb()
 app.use(cookieSession({ name: "session", keys: ["galBaat"], maxAge: 24 * 60 * 60 * 100 }))
 app.use(cors({
-    origin: Frontend_HOST,
-    methods: "GET,POST,PUT,DELETE",
-    credentials: true,
+    origin: process.env.CORS_ORIGIN,
+    credentials: true
 }))
 app.use(express.json())
 app.use(passport.initialize())
