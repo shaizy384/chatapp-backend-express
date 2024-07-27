@@ -11,7 +11,7 @@ const socialLogin = async (req, res) => {
         // if (req.user) {
         if (req.body.email) {
             let user = await User.findOne({ email: req.body.email })
-            if (user.provider !== req.body.provider) {
+            if (user && (user.provider !== req.body.provider)) {
                 return res.status(400).json({ message: `User is registered with email and password` });
             }
         }
