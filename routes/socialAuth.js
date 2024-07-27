@@ -6,9 +6,21 @@ const { registerUser, loginUser, fetchUser, verifyEmail, forgotPassword, resetLi
 const { body } = require("express-validator")
 const validateToken = require("../middleware/validateToken");
 const User = require("../module/userModule");
+const { socialLogin } = require("../controller/socialAuthController");
 // const validateResetToken = require("../middleware/validateResetToken")
 const Frontend_HOST = process.env.Frontend_HOST
 const jwtSec = process.env.JWT_SECRET
+
+
+
+
+router.post('/social_login', [
+    body("accountId", "AccountId is required").exists(),
+    body("name", "Name is required").exists(),
+    body("provider", "Provider is required").exists(),
+], socialLogin)
+
+
 
 router.get('/login/failed', (req, res) => {
     return res.status(400).json({ message: "Login Failed" })

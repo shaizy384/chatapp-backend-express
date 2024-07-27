@@ -94,6 +94,8 @@ const loginUser = async (req, res) => {
     try {
         let user = await User.findOne({ email })
         if (!user) { return res.status(400).json({ message: "Invalid credentials" }) }
+
+        if (user.provider === "facebook" || user.provider === "google") { return res.status(400).json({ message: `User is registered with ${user.provider}` }) }
         console.log(user.isVerified);
 
         let checkPass = await bcrypt.compare(password, user.password)
