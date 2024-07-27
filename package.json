@@ -2,13 +2,13 @@
   "name": "chatbackend",
   "version": "1.0.0",
   "description": "This is the backend of chat app",
-  "main": "server.js",
+  "main": "index.js",
   "engines": {
     "node": "20.x"
   },
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Shahzaib Qasim",
