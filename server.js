@@ -28,6 +28,10 @@ app.use('/api/message', require("./routes/message"))
 app.use('/api/friends', require("./routes/friends"))
 // app.use('/api/google', require("./passport"))
 
+app.get("/", (req, res) => {
+    res.send("GalBaat Backend")
+})
+
 const server = app.listen(port, () => {
     console.log(`This app is listening on port ${port}`);
 })
