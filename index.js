@@ -38,8 +38,7 @@ const server = app.listen(port, () => {
 // starting socket io
 const io = require("socket.io")(server, {
     cors: {
-        origin: 'https://galbaat.vercel.app',
-        methods: ["GET", "POST"]
+        origin: process.env.CORS_ORIGIN
     }
 })
 
