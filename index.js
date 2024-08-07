@@ -38,7 +38,8 @@ const server = app.listen(port, () => {
 // starting socket io
 const io = require("socket.io")(server, {
     cors: {
-        origin: process.env.CORS_ORIGIN
+        origin: process.env.Frontend_HOST,
+        methods: ["GET", "POST"]
     }
 })
 
